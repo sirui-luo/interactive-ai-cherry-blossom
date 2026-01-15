@@ -1,14 +1,17 @@
-
-import React, { useRef } from 'react';
+import React, { useRef, useEffect } from 'react';
 import { Environment, OrbitControls, ContactShadows } from '@react-three/drei';
 import { EffectComposer, Bloom, Vignette, Noise } from '@react-three/postprocessing';
+import * as THREE from 'three';
+import { useThree } from '@react-three/fiber';
 import { BlendFunction } from 'postprocessing';
 import { useFrame } from '@react-three/fiber';
 import { Foliage } from './Foliage';
-import { Ornaments } from './Ornaments';
 import { Polaroids } from './Polaroids';
-import { TreeStar } from './TreeStar';
+import Petals from './Petals';
+import { StarField } from './StarField';
 import { TreeMode } from '../types';
+import { Trunk } from "./Trunk";
+
 
 interface ExperienceProps {
   mode: TreeMode;
@@ -20,6 +23,18 @@ interface ExperienceProps {
 
 export const Experience: React.FC<ExperienceProps> = ({ mode, handPosition, uploadedPhotos, twoHandsDetected, onClosestPhotoChange }) => {
   const controlsRef = useRef<any>(null);
+  const { scene } = useThree();
+
+  const blossomRadius = 5.4;
+  const blossomHeight = 6.4;
+
+  // Add atmospheric fog for depth and harmony
+  React.useEffect(() => {
+    scene.fog = new THREE.FogExp2('#0a0a1a', 0.025);
+    return () => {
+      scene.fog = null;
+    };
+  }, [scene]);
 
   // Update camera rotation based on hand position
   useFrame((_, delta) => {
@@ -85,45 +100,92 @@ export const Experience: React.FC<ExperienceProps> = ({ mode, handPosition, uplo
         enabled={true}
       />
 
-      {/* Lighting Setup for Maximum Luxury */}
-      <Environment preset="lobby" background={false} blur={0.8} />
-      
-      <ambientLight intensity={0.2} color="#004422" />
-      <spotLight 
-        position={[10, 20, 10]} 
-        angle={0.2} 
-        penumbra={1} 
-        intensity={2} 
-        color="#fff5cc" 
-        castShadow 
-      />
-      <pointLight position={[-10, 5, -10]} intensity={1} color="#D4AF37" />
+      {/* Enhanced Lighting Setup for Cherry Blossoms */}
+      <Environment preset="sunset" background={false} blur={0.8} />
 
-      <group position={[0, -5, 0]}>
-        <Foliage mode={mode} count={12000} />
-        <Ornaments mode={mode} count={600} />
-        <Polaroids mode={mode} uploadedPhotos={uploadedPhotos} twoHandsDetected={twoHandsDetected} onClosestPhotoChange={onClosestPhotoChange} />
-        <TreeStar mode={mode} />
-        
-        {/* Floor Reflections */}
-        <ContactShadows 
-          opacity={0.7} 
-          scale={30} 
-          blur={2} 
-          far={4.5} 
-          color="#000000" 
+      {/* Distant star field background layer */}
+      <StarField count={2500} />
+      
+      <ambientLight intensity={0.6} color="#ffffff" />
+
+      {/* Main spotlight - warmer and more intense */}
+      <spotLight
+        position={[8, 18, 12]}
+        angle={0.4}
+        penumbra={1.2}
+        intensity={1.4}
+        color="#fff1f6"   // warm pink-white
+        castShadow
+      />
+
+      {/* Secondary point lights for depth and glow */}
+      <pointLight position={[-10, 6, -8]} intensity={0.45} color="#ffd6e6" />
+      <pointLight position={[10, 8, -6]} intensity={0.3} color="#ffeef7" />
+      <pointLight position={[0, 12, -10]} intensity={0.35} color="#ffffff" />
+
+      {/* Rim light for magical glow */}
+      <pointLight position={[-5, 4, 10]} intensity={0.25} color="#fff0f5" />
+
+
+      <group position={[0, -3.2, 0]}>
+      <group position={[0, 1.7, 0]}>
+        <Trunk />
+      </group>
+
+      <group scale={[1.3, 0.78, 1.3]} position={[0, 0.7, 0]}>
+        <Foliage mode={mode} count={9000} />
+
+        {/* Top airy crown */}
+        <Petals
+          mode={mode}
+          layer="top"
+          count={900}
+          radius={blossomRadius * 0.7}
+          height={blossomHeight}
+        />
+
+        {/* Main body */}
+        <Petals
+          mode={mode}
+          layer="main"
+          count={2200}
+          radius={blossomRadius}
+          height={blossomHeight}
+        />
+
+        {/* Hanging edges */}
+        <Petals
+          mode={mode}
+          layer="skirt"
+          count={1100}
+          radius={blossomRadius}
+          height={blossomHeight}
         />
       </group>
 
+      <Polaroids
+        mode={mode}
+        uploadedPhotos={uploadedPhotos}
+        twoHandsDetected={twoHandsDetected}
+        onClosestPhotoChange={onClosestPhotoChange}
+      />
+
+    </group>
+
+
+        <ContactShadows opacity={0.7} scale={30} blur={2} far={4.5} color="#000000" />
+
+
       <EffectComposer enableNormalPass={false}>
         <Bloom 
-          luminanceThreshold={0.8} 
+          luminanceThreshold={0.75} 
           mipmapBlur 
-          intensity={1.5} 
-          radius={0.6}
+          intensity={1.0} 
+          radius={0.7}
+          levels={8}
         />
-        <Vignette eskil={false} offset={0.1} darkness={0.7} />
-        <Noise opacity={0.02} blendFunction={BlendFunction.OVERLAY} />
+        <Vignette eskil={false} offset={0.15} darkness={0.5} />
+        <Noise opacity={0.01} blendFunction={BlendFunction.OVERLAY} />
       </EffectComposer>
     </>
   );
