@@ -139,7 +139,3 @@ When no hand is detected, you can:
 - Temporary share links (30-day expiration)
 - Instanced rendering for performance
 - Bloom and post-processing effects
-
-## 🎅 Happy Holidays!
-
-May your code be merry and bright! 🎄✨
