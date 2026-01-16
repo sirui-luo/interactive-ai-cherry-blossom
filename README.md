@@ -75,7 +75,7 @@ Key Systems:
    - Use `npm run dev:vercel` to test with full Vercel environment
 
 5. **Open your browser:**
-   - Navigate to `http://localhost:3010`
+   - Navigate to `http://localhost:3010/`
    - Allow camera access for gesture control
    - Click "Upload Photos" to upload your photos
 
