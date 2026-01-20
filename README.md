@@ -4,9 +4,9 @@
   <img src="assets/overview.jpg" alt="Overview" width="600"/>
 </p>
 
-> Transforming interactive holiday magic into a vision of renewal—this project reimagines the original emerald-and-gold luxury Christmas tree as a Cherry Blossom illuminated beneath the galaxy.  
+> Transforming interactive holiday magic into a vision of renewal - this project reimagines the original emerald-and-gold luxury Christmas tree as a Cherry Blossom illuminated beneath the galaxy.  
 >  
-> **Symbolism:** 🌸 Cherry blossoms represent new beginnings, energy, and growth for 2026.
+> 🌸 Cherry blossoms represent new beginnings, energy, and growth for 2026.
 
 ---
 
