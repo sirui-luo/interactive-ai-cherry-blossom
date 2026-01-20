@@ -1,5 +1,6 @@
 # 🌸 Interactive AI Cherry Blossom: Under the Galaxy
 
+image.png
 While the original explored emerald and gold holiday luxury, this version translates those complex systems into a Cherry Blossom under a Galaxy—a symbol of new beginnings, energy, and growth for 2026.
 
 This project explores how AI-assisted development, combined with clear creative intent, can translate imagination into complex interactive systems.

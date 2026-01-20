@@ -22,6 +22,14 @@ import { TreeMode } from '../types';
  * ==================================================================================
  */
 
+function pseudoRandom(seed: number): number {
+  let t = seed + 0x6D2B79F5;
+  t = Math.imul(t ^ (t >>> 15), t | 1);
+  t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+  return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+}
+
+
 const PHOTO_COUNT = 22; // How many polaroid frames to generate
 
 interface PolaroidsProps {
@@ -73,7 +81,9 @@ const PolaroidItem: React.FC<{ data: PhotoData; mode: TreeMode; index: number }>
     
     // 1. Position Interpolation
     const targetPos = isFormed ? data.targetPos : data.chaosPos;
-    const step = delta * data.speed;
+    const chaosBoost = mode === TreeMode.CHAOS ? 2.2 : 1.0;
+    const step = delta * data.speed * chaosBoost;
+
     
     // Smooth lerp to target position
     groupRef.current.position.lerp(targetPos, step);
@@ -107,16 +117,31 @@ const PolaroidItem: React.FC<{ data: PhotoData; mode: TreeMode; index: number }>
         
     } else {
         // Chaos mode - face toward camera with gentle floating
-        // Camera position relative to scene group: [0, 9, 20]
-        const cameraPos = new THREE.Vector3(0, 9, 20);
+
+        // Chaos mode - face outward from tree center (so it's visible from any orbit)
         const dummy = new THREE.Object3D();
         dummy.position.copy(groupRef.current.position);
-        
-        // Make photos face the camera
-        dummy.lookAt(cameraPos);
-        
-        // Smoothly rotate to face camera
+
+        // Tree center in *Polaroids local space* (tune Y if needed)
+        const center = new THREE.Vector3(0, 5, 0);
+
+        // Compute outward direction: (pos - center)
+        const outward = dummy.position.clone().sub(center);
+
+        // If the photo is exactly at center (unlikely), avoid NaN
+        if (outward.lengthSq() < 1e-6) outward.set(0, 0, 1);
+
+        // Look toward a point outward from the center
+        const lookTarget = dummy.position.clone().add(outward);
+
+        // Make photos face outward
+        dummy.lookAt(lookTarget);
+
+        // Optional: flip 180° if you find it’s showing the back
+        // dummy.rotateY(Math.PI);
+
         groupRef.current.quaternion.slerp(dummy.quaternion, delta * 3);
+
         
         // Add gentle floating wobble
         const wobbleX = Math.sin(time * 1.5 + swayOffset) * 0.03;
@@ -212,22 +237,30 @@ export const Polaroids: React.FC<PolaroidsProps> = ({ mode, uploadedPhotos, twoH
         r * Math.sin(theta)
       );
 
-      // 2. Chaos Position - Spread out and closer to camera
-      // Camera is at [0, 4, 20], Scene group offset is [0, -5, 0]
-      // So relative to scene, camera is at y=9
-      const relativeY = 5; // Lower position for better visibility
-      const relativeZ = 20; // Camera Z
-      
-      // Create positions spread widely around camera, very close
-      const angle = (i / count) * Math.PI * 2; // Distribute evenly
-      const distance = 3 + Math.random() * 4; // Distance 3-7 units (very close)
-      const heightSpread = (Math.random() - 0.5) * 8; // Height variation -4 to +4 (more spread)
-      
+      // 2. Chaos Position - Wide spread around the scene (no clustering)
+      const baseY = 6;
+      const baseZ = 14;
+
+      // 2. Chaos Position - Wide spread centered on the tree
+      const center = new THREE.Vector3(0, 5, 0); // tree-centered in local space
+
+      const thetaChaos = (i / count) * Math.PI * 2;
+
+      const radiusBase = 10;
+      const radiusMax = 20;
+      const rChaos = radiusBase + pseudoRandom(i + 77) * (radiusMax - radiusBase);
+
+      const angleJitter = (pseudoRandom(i + 123) - 0.5) * 0.7;
+      const yJitter = (pseudoRandom(i + 999) - 0.5) * 6;
+
+      const angleChaos = thetaChaos + angleJitter;
+
       const chaosPos = new THREE.Vector3(
-        distance * Math.cos(angle) * 1.2, // X spread wider
-        relativeY + heightSpread, // More vertical spread
-        relativeZ - 4 + distance * Math.sin(angle) * 0.5 // Very close to camera (Z ~16-19)
+        center.x + Math.cos(angleChaos) * rChaos,
+        center.y + yJitter,
+        center.z + Math.sin(angleChaos) * rChaos
       );
+
 
       data.push({
         id: i,
