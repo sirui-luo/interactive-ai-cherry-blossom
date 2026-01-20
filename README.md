@@ -1,8 +1,20 @@
 # 🌸 Interactive AI Cherry Blossom: Under the Galaxy
-![Overview](assets/overview.jpg)
-While the original explored emerald and gold holiday luxury, this version translates those complex systems into a Cherry Blossom under a Galaxy—a symbol of new beginnings, energy, and growth for 2026.
 
-This project explores how AI-assisted development, combined with clear creative intent, can translate imagination into complex interactive systems.
+<p align="center">
+  <img src="assets/overview.jpg" alt="Overview" width="600"/>
+</p>
+
+> Transforming interactive holiday magic into a vision of renewal—this project reimagines the original emerald-and-gold luxury Christmas tree as a Cherry Blossom illuminated beneath the galaxy.  
+>  
+> **Symbolism:** 🌸 Cherry blossoms represent new beginnings, energy, and growth for 2026.
+
+---
+
+**About**
+
+This project is a showcase of how AI-assisted development—guided by clear creative intent—can manifest complex ideas as immersive, interactive 3D web experiences.  
+Leveraging React Three Fiber, TypeScript, and more, it turns imagination into reality, blending advanced technical systems with evocative, beautiful visuals.
+
 
 ## 📝 Prompt
 
